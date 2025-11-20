@@ -1,7 +1,15 @@
 🛒 Supermercado API — Prueba Técnica
 
-API REST desarrollada con Spring Boot para la gestión de productos, ventas y estadísticas comerciales en un supermercado.
-Incluye endpoints para registrar ventas, listar sucursales, gestionar productos y obtener estadísticas como el producto más vendido.
+API REST desarrollada con Spring Boot para gestionar productos, ventas, sucursales y estadísticas comerciales de un supermercado.
+Incluye endpoints para:
+
+Registrar ventas
+
+Listar y consultar productos
+
+Gestionar sucursales
+
+Obtener estadísticas, como el producto más vendido
 
 🚀 Tecnologías Utilizadas
 
@@ -15,7 +23,7 @@ Spring Data JPA
 
 Hibernate
 
-MySQL (o H2 si usaste en memoria)
+MySQL (o H2 para pruebas)
 
 Maven
 
@@ -24,40 +32,40 @@ Lombok
 📌 Funcionalidades Principales
 ✔ Gestión de Productos
 
-Listado de productos.
+Listar productos
 
-Consulta de detalle.
+Consultar detalles individuales
 
-Stock, precio y categoría.
+Manejar stock, precio y categoría
 
 ✔ Gestión de Ventas
 
-Registro de ventas.
+Registrar ventas
 
-Cada venta contiene múltiples detalles (items vendidos).
+Manejo de múltiples ítems por venta
 
-Cálculo automático del total.
+Cálculo automático del total de la venta
 
 ✔ Gestión de Sucursales
 
-Alta y consulta de sucursales.
+Crear y listar sucursales
 
 ✔ Estadísticas
 
-Producto más vendido, calculado dinámicamente según todas las ventas.
+Obtener el producto más vendido
 
-Suma de cantidades vendidas por producto usando Collectors.groupingBy.
+Cálculo dinámico mediante Collectors.groupingBy
 
 📊 Endpoint de Estadísticas
-GET /api/estadisticas/producto-mas-vendido
-📥 Ejemplo Respuesta:
+🔹 GET /api/estadisticas/producto-mas-vendido
+📥 Ejemplo de Respuesta:
 {
   "productoId": 1,
   "nombreProducto": "Naranjas",
   "cantidadVendida": 5
 }
 
-📚 Estructura del Proyecto
+📁 Estructura del Proyecto
 src/main/java/com/todocodeacademy/pruebatecsupermercado
 │
 ├── controllers
@@ -85,3 +93,62 @@ src/main/java/com/todocodeacademy/pruebatecsupermercado
     ├── ProductoRepository.java
     ├── VentaRepository.java
     └── SucursalRepository.java
+
+🧠 Lógica del Producto Más Vendido
+
+Se suman las cantidades vendidas agrupando por producto:
+
+ventas.stream()
+      .flatMap(venta -> venta.getDetalleVenta().stream())
+      .collect(Collectors.groupingBy(
+          detalle -> detalle.getProducto(),
+          Collectors.summingInt(detalle -> detalle.getCantidad())
+      ));
+
+
+Luego se obtiene el producto con mayor cantidad vendida:
+
+.max(Map.Entry.comparingByValue())
+
+⚙️ Configuración
+application.properties
+spring.datasource.url=jdbc:mysql://localhost:3306/supermercado
+spring.datasource.username=root
+spring.datasource.password=tu_password
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+▶ Ejecución del Proyecto
+
+Desde la terminal:
+
+mvn spring-boot:run
+
+
+O desde tu IDE ejecutando la clase principal PruebaTecSupermercadoApplication.
+
+🧪 Datos de Prueba
+
+Ejemplo de ventas usadas para validar el cálculo del producto más vendido:
+
+[
+  {
+    "id": 1,
+    "detalles": [
+      { "nombreProducto": "Coca Cola 1.5L", "cantidadProducto": 2 },
+      { "nombreProducto": "Naranjas", "cantidadProducto": 3 }
+    ]
+  },
+  {
+    "id": 2,
+    "detalles": [
+      { "nombreProducto": "Inca Cola 1.5L", "cantidadProducto": 2 }
+    ]
+  }
+]
+
+📄 Licencia
+
+Proyecto desarrollado como prueba técnica.
+Libre uso para fines educativos o personales.
